@@ -1,0 +1,32 @@
+Just a few links, comments, etc...
+- general config: https://wiki.mairlist.com/config:remotecontrol:k8055
+
+Idea: read initial config from .ini file
+- would happen in OnLoad (or rather: Init, which can be called from OnLoad as well as Main())
+- check if natively support / could be extended by way of a unit:
+  - check for "SWAG" archive
+  - check those links:
+    - http://computer-programming-forum.com/29-pascal/1a7b1ed0ef65553f.htm
+    - http://computer-programming-forum.com/31-pascal/df30500e5471b1ea.htm
+
+Idea: use inputs for testing:
+- use a config variable testmode=all|single
+  - for testmode = all: shortpress on input switches all outputs to the same pattern
+    1.: continuous
+    2.: slow_blink (1 Hz)
+    3.: fast_blink (2 Hz)
+    4.: alt_blink (alternate slow and fast)
+    5.: off
+  - for testmode = single: shortpress on each input toggles the corresponding output through the patterns (see above)
+  - longpress: >3 sec on any input toggles testmode between "single" and "all" and resets all outputs
+  
+Idea: if using multiple scripts you can exchange strings between modules:
+- Module A: SetRuntimeData(Key, Value: string);
+- Module B: GetRuntimeData(Key);
+  - Alternative: watch for changes:
+    procedure OnRuntimeDataChange(Key, Value: string);
+    begin
+    end;
+    
+Idea: use custom mAirlist commands as triggers
+- OnExecuteCommand (siehe 2. Teil des Posts): https://community.mairlist.com/t/gelost-k8055-script-talktimer-mit-rotlichtsteuerung/11435/4
