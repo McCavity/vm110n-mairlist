@@ -1,0 +1,248 @@
+// vm110_comms.mls
+//
+//        written by Henning 'McCavity' Halfpap
+//
+//        Copyright 2021 Henning Halfpap
+//
+//        Licensed under the Apache License, Version 2.0 (the "License");
+//        you may not use this file except in compliance with the License.
+//        You may obtain a copy of the License at
+//
+//            http://www.apache.org/licenses/LICENSE-2.0
+//
+//        Unless required by applicable law or agreed to in writing, software
+//        distributed under the License is distributed on an "AS IS" BASIS,
+//        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//        See the License for the specific language governing permissions and
+//        limitations under the License.
+//
+//        Installation instructions:
+//
+//        1. Place this script in your mAirlist script folder (e.g.
+//           C:\Program Files\mAirlist\scripts) (or clone the git repo)
+//        2. Edit this script and set DEBUG to 'true'
+//        ...
+// 
+// Version 0.0.1 - 14.03.2021 - Initial skeleton
+
+const
+/// General script constants //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ME                        = 'vm110_comms';               // The name of this script (to be used in log entries, e.g.)
+
+/// Configurable settings - adapt to your environment /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// see if this can be evacuated to an .ini file - see scratchpad.txt
+  DEBUG                     = true;                              // set this to 'false' in production environment - will print *every* message to system log!
+  BLINK_SLOW                = 500                                 // 500 ms = 1/2 s period = 1 Hz
+  BLINK_FAST                = 250                                 // 250 ms = 1/4 s period = 2 Hz
+  ...
+  
+/// BEGIN Velleman K8055(N) / VM110(N) settings DON´T touch unless you know what you are doing!!! /////////////////////////////////////////////////////////////////////////////////
+  ... define hardware specific constatns (if at all necessary the cards are supported by mAirlist so this shouldn't benecessary)
+
+var 
+  // define hardware specific variables
+/// END Velleman K8055(N) / VM110(N) settings /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Internal script variables (global) ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  VoiceTrack:               boolean;                              // This is 'true' while Voice Track recorder or editor are open, 'false' otherwise
+                                                                  // TODO: check if this can be queried from mAirlist (as well as 'Assist' and 'Auto' states)
+procedure writeDebug(message: String);
+  var
+   messageType:             TLogCategory;
+  begin
+    messageType := lcDebug;
+    if (DEBUG = true) then
+      begin
+	Instance.GetLogger.SystemLog(messageType, message);
+      end;
+  end;
+
+procedure writeError(message: String);
+  var
+   messageType:             TLogCategory;
+  begin
+    messageType := lcError;
+    Instance.GetLogger.SystemLog(messageType, message);
+  end;
+
+// leave this in for now - delete either comment or function altogether ;-)
+function StateToStr(iState: TPlayerState): String;
+  begin
+    Case iState Of
+      psEmpty:    Result := 'psEmpty';
+      psLoading:  Result := 'psLoading';
+      psLoaded:   Result := 'psLoaded';
+      psPlaying:  Result := 'psPlaying';
+      psFading:   Result := 'psFading';
+      psEOF:      Result := 'psEOF';
+      psError:    Result := 'psError';
+      psPaused:   Result := 'psPaused';
+      psStopped:  Result := 'psStopped';
+      psPFL:      Result := 'psPFL';
+      psFlashEOF: Result := 'psFlashEOF';
+      psNext:     Result := 'psNext';
+    else          Result := 'unknown';
+    end;
+  end;
+
+
+procedure initController;
+  var
+    i:                        integer;
+
+  begin
+    writeDebug(ME + '.initController called.');
+
+
+    VoiceTrack               := false;
+    // you might probably want to grab this state from mAirlist directly - it shouldn't be in VT when OnLoad strikes, but if called as a one-time script you'll never know...
+
+    writeDebug(ME + '.initController finished.');
+  end;
+
+procedure testController;
+  var
+    i:                       integer;
+
+  begin
+    writeDebug(ME + '.testController called.');
+
+    // automated test - idea: do a "K.I.T.T. animation on the five outputs - three cycles or so ;-)
+
+    writeDebug(ME + '.testController finished.');
+  end;
+
+procedure resetController;
+  var
+    i:                        integer;
+
+  begin
+    writeDebug(ME + '.resetController called.');
+
+    // set all outputs to "off"
+
+    writeDebug(ME + '.resetController finished.');
+  end;
+
+procedure openController;
+
+  begin
+    writeDebug(ME + '.openController called.');
+
+
+    writeDebug(ME + '.openController finished.');
+  end;
+
+procedure closeController;
+  begin
+    writeDebug(ME + '.closeController called.');
+
+
+    writeDebug(ME + '.closeController finished.');
+  end;
+
+// do we need those? maybe use it to indicate on the outputs if we're *not* in Assist (= live) mode?
+procedure setAssist;
+  begin
+    writeDebug(ME + '.SetAssist called.');
+
+    writeDebug(ME + '.SetAssist finished.');
+  end;
+
+procedure setAutomation;
+  begin
+    writeDebug(ME + '.SetAutomation called.');
+
+    writeDebug(ME + '.SetAutomation finished.');
+  end;
+
+procedure setVoicetrack;
+  begin
+    writeDebug(ME + '.SetVoicetrack called.');
+
+    writeDebug(ME + '.SetVoicetrack finished.');
+  end;
+
+procedure OnLoad;
+  var
+    i: integer;
+
+  begin
+    writeDebug(ME + '.OnLoad called.');
+
+    initController; 
+    openController;
+
+    // get current states for the outputs & set accordingly
+
+    writeDebug(ME + '.OnLoad finished.');
+  end;
+
+procedure OnUnload;
+  begin
+    writeDebug(ME + '.OnUnload called.');
+ 
+    resetController;
+    closeController;
+ 
+    writeDebug(ME + '.OnUnload finished.');
+  end;
+
+// Called when automation is enabled
+procedure OnAutomationOn(PlaylistIndex: integer);
+  begin
+    writeDebug(ME + '.OnAutomationOn called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
+
+    setAutomation;
+
+    writeDebug(ME + '.OnAutomationOn finished.');
+  end;
+
+// Called when automation is disabled
+procedure OnAutomationOff(PlaylistIndex: integer);
+  begin
+    writeDebug(ME + '.OnAutomationOff called. PlaylistIndex: ' + IntToStr(PlaylistIndex));
+
+    writeDebug(ME + '.OnAutomationOff finished.');
+  end;
+
+
+// Called when (playlist) player reaches EOF warning point (default: 10s before end)
+procedure OnPlayerEOFWarning(PlaylistIndex: integer; PlayerIndex: integer);
+//  var
+//    playerAddress: integer;
+// probably not needed?
+
+begin
+    writeDebug(ME + '.OnPlayerEOFWarning called. PlaylistIndex: ' + IntToStr(PlaylistIndex) + ', PlayerIndex: ' + IntToStr(PlayerIndex));
+    
+    // set "onAir" to slow blinking?
+
+    writeDebug(ME + '.OnPlayerEOFWarning finished.');
+  end;
+
+// Called when RuntimeData (global variables shared among scripts) change.
+// Set data with SetRuntimData(key, value);
+procedure OnRuntimeDataChange(Key, Value: string);
+  begin
+    writeDebug(ME + '.OnRuntimeDataChange called. Key: ' + Key + ', Value: ' + Value);
+
+    writeDebug(ME + '.OnRuntimeDataChange finished.');
+  end;
+
+// Main()
+begin
+  writeDebug(ME + '.Main() called.');
+  initController;
+  openController;
+  if (DEBUG = true) then
+    begin
+      testController;
+    end;
+  if (DEBUG = false) then
+    begin
+      resetController;
+    end;
+  closeController;
+  writeDebug(ME + '.Main() finished.');
+end.
