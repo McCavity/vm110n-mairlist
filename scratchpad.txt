@@ -1,6 +1,44 @@
 Just a few links, comments, etc...
 - general config: https://wiki.mairlist.com/config:remotecontrol:k8055
 
+Feature: on air
+- colour: green
+- states:
+  - not connected: off
+  - connection lost: fast blink (how do we know that?)
+  - EOM on any playlist Player: slow blink
+  - EOM & error simultaneously: alternate blink
+
+Feature: mic on
+- colour: red
+- states:
+  - mic off: off
+  - mic on: continuous
+  - talk timer exceeded (configurable): slow blink
+
+Feature: get & display phone status
+- colour: amber
+- states:
+  - idle: off
+  - connected: continuous
+  - incoming call: slow blink
+- more info: https://community.mairlist.com/t/anrufstatus-von-phoner-lite-in-mairlist-und-dem-airlite-anzeigen/14242
+
+Feature: ARI
+- colour: white
+- states:
+  - any (cartwall?) player plays "ARIaus.wav": off
+  - any (cartwall?) player plays "ARIan.wav": continuous
+  - ARI timer exceeded (configurable): slow blink
+
+Feature: Pegel
+- colour: blue
+- states:
+  - within limits: off
+  - threshold exceeded: continuous
+  - timer1 exceeded (configurable): slow blink
+  - timer2 exceeded (configurable): fast blink
+
 Idea: read initial config from .ini file
 - would happen in OnLoad (or rather: Init, which can be called from OnLoad as well as Main())
 - check if natively support / could be extended by way of a unit:
