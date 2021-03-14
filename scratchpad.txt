@@ -14,8 +14,9 @@ Feature: mic on
 - states:
   - mic off: off
   - mic on: continuous
-  - talk timer exceeded (configurable): slow blink
-
+  - talk timer1 exceeded (configurable,  90 s): slow blink
+  - talk timer2 exceeded (configurable, 120 s): fast blink
+ 
 Feature: get & display phone status
 - colour: amber
 - states:
@@ -29,15 +30,16 @@ Feature: ARI
 - states:
   - any (cartwall?) player plays "ARIaus.wav": off
   - any (cartwall?) player plays "ARIan.wav": continuous
-  - ARI timer exceeded (configurable): slow blink
+  - ARI timer1 exceeded (configurable, 60 s): slow blink
+  - ARI timer2 exceeded (configurable, 90 s): fast blink
 
 Feature: Pegel
 - colour: blue
 - states:
   - within limits: off
   - threshold exceeded: continuous
-  - timer1 exceeded (configurable): slow blink
-  - timer2 exceeded (configurable): fast blink
+  - timer1 exceeded (configurable,  5 s): slow blink
+  - timer2 exceeded (configurable, 10 s): fast blink
 
 Idea: read initial config from .ini file
 - would happen in OnLoad (or rather: Init, which can be called from OnLoad as well as Main())
@@ -57,6 +59,8 @@ Idea: use inputs for testing:
     5.: off
   - for testmode = single: shortpress on each input toggles the corresponding output through the patterns (see above)
   - longpress: >3 sec on any input toggles testmode between "single" and "all" and resets all outputs
+    - indicate "all" by switching all outputs on for 1 s
+    - indicate "single" by cycling through all outputs for 200 ms each
   
 Idea: if using multiple scripts you can exchange strings between modules:
 - Module A: SetRuntimeData(Key, Value: string);
