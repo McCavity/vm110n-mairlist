@@ -42,7 +42,11 @@
 const
 /// General script constants /////////////////////////////////////////
   ME         = 'vm110_comms'; // The name of this script (to be used
-                              // in log entries, e.g.)
+                              // in log entries, e.g.
+  sOFF       = 0;             // state constants for the channels
+  sON        = 1;
+  sSLOW      = 2;             // slow and fast can be added to
+  sFAST      = 4;             // facilitate alternate blinking
 
 /// Configurable settings - adapt to your environment ////////////////
 // see if this can be evacuated to an .ini file - see scratchpad.txt
@@ -55,13 +59,54 @@ const
   AMBER = 2;
   WHITE = 3;
   BLUE  = 4;
+  TKTT1 = 90;   // Talk timer 1 (in seconds)
+  TKTT2 = 120;  // Talk timer 1 (in seconds)
+  ARIT1 = 60;   // ARI timer 1 (in seconds)
+  ARIT2 = 90;   // ARI timer 2 (in seconds)
+  LVLT1 = 5;    // Level timer 1 (in seconds)
+  LVLT1 = 10;   // Level timer 2 (in seconds)
   
-var 
+var
 /// Internal script variables (global) ///////////////////////////////
   isOnAir, isVoiceTrack: boolean;   // keep states local in the script
                                     // set by the appropriate On...
 				    // procedures
-				    
+  channelStates: array[1..8] of integer; // beware the Obiwan error
+
+function getState(iPort: integer): integer;
+  begin
+    if iPort < 0 or iPort > 7 then
+      begin
+        writeError(ME
+                 + '.getState: port index out of bounds: '
+                 + IntToStr(iPort)
+                 + '.');
+        Result := -1
+      end;
+    else
+      Result := channelStates[iPort + 1];
+  end;
+
+procedure setState(iPort, iState: integer): integer;
+  begin
+    if iPort < 0 or iPort > 7 then
+      begin
+        writeError(ME
+                 + '.getState: port index out of bounds: '
+                 + IntToStr(iPort)
+                 + '.');
+      end;
+    else if iState < 0 or iState > 6 then
+      begin
+        writeError(ME
+                 + '.getState: state value out of bounds: '
+                 + IntToStr(iState)
+                 + '.');
+      end;
+    else
+      channelStates[iPort + 1] := iState;
+  end;
+
 function Abs(r: integer): integer;
 // Implementation of the mathematical Abs() function
 //
@@ -167,6 +212,7 @@ procedure resetController;
     begin
       for i := 0 to 7 do
         Velleman(i, 0);
+	setState(i, 0);
     end;
     writeDebug(ME + '.resetController finished.');
   end;
@@ -193,12 +239,14 @@ procedure OnOnAir;
   begin
     isOnAir := true;
     Velleman(GREEN, 1);
+    setState(GREEN, 1);
   end;
 
 procedure OnOffAir;
   begin
     isOnAir := false;
     Velleman(GREEN, 0);
+    setState(GREEN, 0);
   end;
 
 // Called when (playlist) player reaches EOF warning point (default:
