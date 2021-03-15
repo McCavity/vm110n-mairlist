@@ -141,7 +141,7 @@ procedure testController;
     writeDebug(ME + '.testController called.');
     for k := 0 to 2 do
       begin
-        for i := 0 downto 7 do
+        for i := 0 to 7 do
           begin
             Velleman(i, 1);
             Sleep(200);
