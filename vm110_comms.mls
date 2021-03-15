@@ -64,7 +64,7 @@ const
   ARIT1 = 60;   // ARI timer 1 (in seconds)
   ARIT2 = 90;   // ARI timer 2 (in seconds)
   LVLT1 = 5;    // Level timer 1 (in seconds)
-  LVLT1 = 10;   // Level timer 2 (in seconds)
+  LVLT2 = 10;   // Level timer 2 (in seconds)
   
 var
 /// Internal script variables (global) ///////////////////////////////
@@ -72,40 +72,6 @@ var
                                     // set by the appropriate On...
 				    // procedures
   channelStates: array[1..8] of integer; // beware the Obiwan error
-
-function getState(iPort: integer): integer;
-  begin
-    if iPort < 0 or iPort > 7 then
-      begin
-        writeError(ME
-                 + '.getState: port index out of bounds: '
-                 + IntToStr(iPort)
-                 + '.');
-        Result := -1
-      end;
-    else
-      Result := channelStates[iPort + 1];
-  end;
-
-procedure setState(iPort, iState: integer): integer;
-  begin
-    if iPort < 0 or iPort > 7 then
-      begin
-        writeError(ME
-                 + '.getState: port index out of bounds: '
-                 + IntToStr(iPort)
-                 + '.');
-      end;
-    else if iState < 0 or iState > 6 then
-      begin
-        writeError(ME
-                 + '.getState: state value out of bounds: '
-                 + IntToStr(iState)
-                 + '.');
-      end;
-    else
-      channelStates[iPort + 1] := iState;
-  end;
 
 function Abs(r: integer): integer;
 // Implementation of the mathematical Abs() function
@@ -135,7 +101,8 @@ procedure writeDebug(message: String);
     if (DEBUG = true) then
       begin
         messageType := lcDebug;
-	Instance.GetLogger.SystemLog(messageType, message);
+	    //Instance.GetLogger.SystemLog(messageType, message);
+	    Instance.GetLogger.SystemLog(messageType, 'foo', message);
       end;
   end;
 
@@ -149,7 +116,41 @@ procedure writeError(message: String);
     messageType: TLogCategory;
   begin
     messageType := lcError;
-    Instance.GetLogger.SystemLog(messageType, message);
+    Instance.GetLogger.SystemLog(messageType, 'bar', message);
+  end;
+  
+function getState(iPort: integer): integer;
+  begin
+    if (iPort < 0) or (iPort > 7) then
+	  begin
+        writeError(ME
+                 + '.getState: port index out of bounds: '
+                 + IntToStr(iPort)
+                 + '.');
+        Result := -1;
+	  end
+    else
+      Result := channelStates[iPort + 1];
+  end;
+
+procedure setState(iPort, iState: integer);
+  begin
+    if (iPort < 0) or (iPort > 7) then
+      begin
+        writeError(ME
+                 + '.getState: port index out of bounds: '
+                 + IntToStr(iPort)
+                 + '.');
+      end
+    else if (iState < 0) or (iState > 6) then
+      begin
+        writeError(ME
+                 + '.getState: state value out of bounds: '
+                 + IntToStr(iState)
+                 + '.');
+      end
+    else
+      channelStates[iPort + 1] := iState;
   end;
 
 procedure Velleman(iColor, iState: integer);
@@ -174,7 +175,7 @@ procedure initController;
     i: integer;
   begin
     writeDebug(ME + '.initController called.');
-    isOnAir.     := false;
+    isOnAir      := false;
     isVoiceTrack := false;
     writeDebug(ME + '.initController finished.');
   end;
