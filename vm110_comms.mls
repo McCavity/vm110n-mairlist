@@ -119,6 +119,29 @@ procedure writeError(message: String);
     Instance.GetLogger.SystemLog(messageType, 'bar', message);
   end;
   
+procedure Velleman(iColor, iState: integer);
+// Sets the state for the outputs of a Velleman K8055(N)/VM110(N) card
+//
+//    Args:
+//        iColor (integer): the output port to be switched (0..7)
+//                          ports 0..4 are colour-coded (see const)
+//        iState (integer): the desired state (0 = off, 1 = on)
+//
+  begin
+    writeDebug(ME + '.Velleman called.');
+    if iState = 0 then
+      K8055Remote(0).ClearDigitalChannel(iColor)
+    else if iState = 1 then
+      K8055Remote(0).SetDigitalChannel(iColor);
+    writeDebug(ME + '.Velleman finished.');
+  end;
+
+procedure blink(iPort, iState: integer);
+  begin
+    writeDebug(ME + '.blink called.');
+    writeDebug(ME + '.blink finished.');
+	end;
+
 function getState(iPort: integer): integer;
   begin
     if (iPort < 0) or (iPort > 7) then
@@ -132,12 +155,6 @@ function getState(iPort: integer): integer;
     else
       Result := channelStates[iPort + 1];
   end;
-
-procedure blink(iPort, iState: integer);
-  begin
-    writeDebug(ME + '.blink called.');
-    writeDebug(ME + '.blink finished.');
-	end;
 
 procedure setState(iPort, iState: integer);
   begin
@@ -162,23 +179,6 @@ procedure setState(iPort, iState: integer);
                  + '.');
      writeDebug(ME + '.setState finished.');
  end;
-
-procedure Velleman(iColor, iState: integer);
-// Sets the state for the outputs of a Velleman K8055(N)/VM110(N) card
-//
-//    Args:
-//        iColor (integer): the output port to be switched (0..7)
-//                          ports 0..4 are colour-coded (see const)
-//        iState (integer): the desired state (0 = off, 1 = on)
-//
-  begin
-    writeDebug(ME + '.Velleman called.');
-    if iState = 0 then
-      K8055Remote(0).ClearDigitalChannel(iColor)
-    else if iState = 1 then
-      K8055Remote(0).SetDigitalChannel(iColor);
-    writeDebug(ME + '.Velleman finished.');
-  end;
 
 procedure initController;
   var
