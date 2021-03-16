@@ -98,11 +98,11 @@ procedure writeDebug(message: String);
   var
     messageType: TLogCategory;
   begin
-    if (DEBUG = true) then
+    if DEBUG then
       begin
         messageType := lcDebug;
-	    //Instance.GetLogger.SystemLog(messageType, message);
-	    Instance.GetLogger.SystemLog(messageType, 'foo', message);
+        //Instance.GetLogger.SystemLog(messageType, message);
+        Instance.GetLogger.SystemLog(messageType, 'foo', message);
       end;
   end;
 
@@ -133,8 +133,15 @@ function getState(iPort: integer): integer;
       Result := channelStates[iPort + 1];
   end;
 
+procedure blink(iPort, iState: integer);
+  begin
+    writeDebug(ME + '.blink called.');
+    writeDebug(ME + '.blink finished.');
+	end;
+
 procedure setState(iPort, iState: integer);
   begin
+    writeDebug(ME + '.setState called.');
     if (iPort < 0) or (iPort > 7) then
       begin
         writeError(ME
@@ -142,16 +149,19 @@ procedure setState(iPort, iState: integer);
                  + IntToStr(iPort)
                  + '.');
       end
-    else if (iState < 0) or (iState > 6) then
-      begin
+    else
+      if (iState >= 0) or (iState <= 6) then
+        channelStates[iPort + 1] := iState;
+			Case iState Of
+        0..1: Velleman(iPort, iState);
+        2..6: blink(iPort, iState);
+      else
         writeError(ME
                  + '.getState: state value out of bounds: '
                  + IntToStr(iState)
                  + '.');
-      end
-    else
-      channelStates[iPort + 1] := iState;
-  end;
+     writeDebug(ME + '.setState finished.');
+ end;
 
 procedure Velleman(iColor, iState: integer);
 // Sets the state for the outputs of a Velleman K8055(N)/VM110(N) card
@@ -239,15 +249,13 @@ procedure OnUnload;
 procedure OnOnAir;
   begin
     isOnAir := true;
-    Velleman(GREEN, 1);
-    setState(GREEN, 1);
+    setState(GREEN, sON);
   end;
 
 procedure OnOffAir;
   begin
     isOnAir := false;
-    Velleman(GREEN, 0);
-    setState(GREEN, 0);
+    setState(GREEN, sOFF);
   end;
 
 // Called when (playlist) player reaches EOF warning point (default:
@@ -280,11 +288,11 @@ procedure OnRuntimeDataChange(Key, Value: string);
 begin
   writeDebug(ME + '.Main() called.');
   initController;
-  if (DEBUG = true) then
+  if DEBUG then
     begin
       testController;
     end;
-  if (DEBUG = false) then
+  if NOT DEBUG then
     begin
       resetController;
     end;
