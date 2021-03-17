@@ -89,22 +89,24 @@ function Abs(r: integer): integer;
       Result := r;
   end;
 
-procedure writeDebug(message: String);
+//procedure writeDebug(message: String);
 // Sends debug messages to mAirlist SystemLog
 //
 //    Args:
 //        message (string): the message
 //
-  var
+(*  var
     messageType: TLogCategory;
   begin
     if DEBUG then
       begin
         messageType := lcDebug;
         //Instance.GetLogger.SystemLog(messageType, message);
-        Instance.GetLogger.SystemLog(messageType, 'foo', message);
+        //Instance.GetLogger.SystemLog(messageType, 'foo', message);
+        //Instance.GetLogger.SystemLog('DEBUG: ' + message);
+        Instance.GetLogger.SystemLog(message);
       end;
-  end;
+  end;*)
 
 procedure writeError(message: String);
 // Sends error messages to mAirlist SystemLog
@@ -128,18 +130,18 @@ procedure Velleman(iColor, iState: integer);
 //        iState (integer): the desired state (0 = off, 1 = on)
 //
   begin
-    writeDebug(ME + '.Velleman called.');
+//    writeDebug(ME + '.Velleman called.');
     if iState = 0 then
       K8055Remote(0).ClearDigitalChannel(iColor)
     else if iState = 1 then
       K8055Remote(0).SetDigitalChannel(iColor);
-    writeDebug(ME + '.Velleman finished.');
+//    writeDebug(ME + '.Velleman finished.');
   end;
 
 procedure blink(iPort, iState: integer);
   begin
-    writeDebug(ME + '.blink called.');
-    writeDebug(ME + '.blink finished.');
+//    writeDebug(ME + '.blink called.');
+//    writeDebug(ME + '.blink finished.');
 	end;
 
 function getState(iPort: integer): integer;
@@ -158,7 +160,7 @@ function getState(iPort: integer): integer;
 
 procedure setState(iPort, iState: integer);
   begin
-    writeDebug(ME + '.setState called.');
+//    writeDebug(ME + '.setState called.');
     if (iPort < 0) or (iPort > 7) then
       begin
         writeError(ME
@@ -167,83 +169,87 @@ procedure setState(iPort, iState: integer);
                  + '.');
       end
     else
-      if (iState >= 0) or (iState <= 6) then
-        channelStates[iPort + 1] := iState;
-			Case iState Of
-        0..1: Velleman(iPort, iState);
-        2..6: blink(iPort, iState);
-      else
-        writeError(ME
-                 + '.getState: state value out of bounds: '
-                 + IntToStr(iState)
-                 + '.');
-     writeDebug(ME + '.setState finished.');
+	  begin
+        if (iState >= 0) or (iState <= 6) then
+          channelStates[iPort + 1] := iState;
+	    Case iState Of
+          0..1: Velleman(iPort, iState);
+          2..6: blink(iPort, iState);
+        else
+          writeError(ME
+                   + '.getState: state value out of bounds: '
+                   + IntToStr(iState)
+                   + '.');
+		end;
+      end;
+//    writeDebug(ME + '.setState finished.');
  end;
 
 procedure initController;
   var
     i: integer;
   begin
-    writeDebug(ME + '.initController called.');
+//    writeDebug(ME + '.initController called.');
     isOnAir      := false;
     isVoiceTrack := false;
-    writeDebug(ME + '.initController finished.');
+//    writeDebug(ME + '.initController finished.');
   end;
 
 procedure testController;
   var
     i, k: integer;
   begin
-    writeDebug(ME + '.testController called.');
+//    writeDebug(ME + '.testController called.');
     for k := 0 to 2 do
       begin
-        for i := 0 to 7 do
+        for i := 1 to 8 do
           begin
             Velleman(i, 1);
-            Sleep(200);
+            Sleep(1000);
             Velleman(i, 0);
+			Sleep(200);
           end;
-        for i := 7 downto 0 do
+        for i := 8 downto 1 do
           begin
             Velleman(i, 1);
-            Sleep(200);
+            Sleep(100);
             Velleman(i, 0);
           end;
           //Sleep(500);
       end;  
-    writeDebug(ME + '.testController finished.');
+  //  writeDebug(ME + '.testController finished.');
   end;
 
 procedure resetController;
   var
     i: integer;
   begin
-    writeDebug(ME + '.resetController called.');
+//    writeDebug(ME + '.resetController called.');
     // set all outputs to "off"
     begin
       for i := 0 to 7 do
         Velleman(i, 0);
 	setState(i, 0);
     end;
-    writeDebug(ME + '.resetController finished.');
+//    writeDebug(ME + '.resetController finished.');
   end;
 
 procedure OnLoad;
   var
     i: integer;
   begin
-    writeDebug(ME + '.OnLoad called.');
+//    writeDebug(ME + '.OnLoad called.');
     initController; 
     testController
     resetController
-    writeDebug(ME + '.OnLoad finished.');
+//    writeDebug(ME + '.OnLoad finished.');
   end;
 
 procedure OnUnload;
   begin
-    writeDebug(ME + '.OnUnload called.'); 
+//    writeDebug(ME + '.OnUnload called.'); 
     resetController;
-    writeDebug(ME + '.OnUnload finished.');
+//    writeDebug(ME + '.OnUnload finished.');
   end;
 
 procedure OnOnAir;
@@ -263,30 +269,30 @@ procedure OnOffAir;
 procedure OnPlayerEOFWarning(PlaylistIndex: integer;
                              PlayerIndex: integer);
 begin
-    writeDebug(ME
-             + '.OnPlayerEOFWarning called. PlaylistIndex: '
-             + IntToStr(PlaylistIndex)
-             + ', PlayerIndex: '
-             + IntToStr(PlayerIndex));    
+//    writeDebug(ME
+//             + '.OnPlayerEOFWarning called. PlaylistIndex: '
+//             + IntToStr(PlaylistIndex)
+//             + ', PlayerIndex: '
+//             + IntToStr(PlayerIndex));    
     // set "onAir" to slow blinking
-    writeDebug(ME + '.OnPlayerEOFWarning finished.');
+//    writeDebug(ME + '.OnPlayerEOFWarning finished.');
   end;
 
 // Called when RuntimeData (global variables shared among scripts) change.
 // Set data with SetRuntimData(key, value);
 procedure OnRuntimeDataChange(Key, Value: string);
   begin
-    writeDebug(ME
-             + '.OnRuntimeDataChange called. Key: '
-             + Key 
-             + ', Value: '
-             + Value);
-    writeDebug(ME + '.OnRuntimeDataChange finished.');
+//    writeDebug(ME
+//             + '.OnRuntimeDataChange called. Key: '
+//             + Key 
+//             + ', Value: '
+//             + Value);
+//    writeDebug(ME + '.OnRuntimeDataChange finished.');
   end;
 
 // Main()
 begin
-  writeDebug(ME + '.Main() called.');
+//  writeDebug(ME + '.Main() called.');
   initController;
   if DEBUG then
     begin
@@ -296,5 +302,5 @@ begin
     begin
       resetController;
     end;
-  writeDebug(ME + '.Main() finished.');
+//  writeDebug(ME + '.Main() finished.');
 end.
