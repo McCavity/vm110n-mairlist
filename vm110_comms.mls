@@ -96,6 +96,35 @@ function Abs(r: integer): integer;
       Result := r;
   end;
   
+procedure writeDebug(message: String);
+// Sends debug messages to mAirlist SystemLog
+//
+//    Args:
+//        message (string): the message
+//
+  var
+    messageType: TLogCategory;
+  begin
+    if DEBUG then
+      begin
+        messageType := lcDebug;
+        Instance.GetLogger.SystemLog(messageType, message, false);
+      end;
+  end;
+
+procedure writeError(message: String);
+// Sends error messages to mAirlist SystemLog
+//
+//    Args:
+//        message (string): the message
+//
+  var
+    messageType: TLogCategory;
+  begin
+    messageType := lcError;
+    Instance.GetLogger.SystemLog(messageType, message, false);
+  end;
+  
 procedure Velleman(iColor, iState: integer);
 // Sets the state for the outputs of a Velleman K8055(N)/VM110(N) card
 //
@@ -105,10 +134,12 @@ procedure Velleman(iColor, iState: integer);
 //        iState (integer): the desired state (0 = off, 1 = on)
 //
   begin
+    writeDebug(ME + '.Velleman() called.');
     if iState = 0 then
       K8055Remote(0).ClearDigitalChannel(iColor)
     else if iState = 1 then
       K8055Remote(0).SetDigitalChannel(iColor);
+    writeDebug(ME + '.Velleman called.');
   end;
 
 procedure blink(iPort, iState: integer);
