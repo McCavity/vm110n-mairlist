@@ -54,11 +54,6 @@ const
                 // will print *every* message to system log!
   SLOW  = 500;  // 500 ms = 1/2 s period = 1 Hz
   FAST  = 250;  // 250 ms = 1/4 s period = 2 Hz
-  GREEN = 0;
-  RED   = 1;
-  AMBER = 2;
-  WHITE = 3;
-  BLUE  = 4;
   TKTT1 = 90;   // Talk timer 1 (in seconds)
   TKTT2 = 120;  // Talk timer 1 (in seconds)
   ARIT1 = 60;   // ARI timer 1 (in seconds)
@@ -66,12 +61,24 @@ const
   LVLT1 = 5;    // Level timer 1 (in seconds)
   LVLT2 = 10;   // Level timer 2 (in seconds)
   
+/// BEGIN Velleman K8055(N) / VM110(N) settings //////////////////////
+/// DON´T touch unless you know what you are doing!!! ////////////////
+  pMIN  = 1;    // Lowest port
+  pMAX  = 8;    // Highest port
+  GREEN = pMIN;
+  RED   = pMIN + 1;
+  AMBER = pMIN + 2;
+  WHITE = pMIN + 3;
+  BLUE  = pMIN + 4;
+
+/// END Velleman K8055(N) / VM110(N) settings ////////////////////////
+
 var
 /// Internal script variables (global) ///////////////////////////////
   isOnAir, isVoiceTrack: boolean;   // keep states local in the script
                                     // set by the appropriate On...
 				    // procedures
-  channelStates: array[1..8] of integer; // beware the Obiwan error
+  channelStates: array[1..8] of integer; // keep local channel states
 
 function Abs(r: integer): integer;
 // Implementation of the mathematical Abs() function
@@ -108,25 +115,25 @@ function Abs(r: integer): integer;
       end;
   end;*)
 
-procedure writeError(message: String);
+//procedure writeError(message: String);
 // Sends error messages to mAirlist SystemLog
 //
 //    Args:
 //        message (string): the message
 //
-  var
+(*  var
     messageType: TLogCategory;
   begin
     messageType := lcError;
     Instance.GetLogger.SystemLog(messageType, 'bar', message);
-  end;
+  end; *)
   
 procedure Velleman(iColor, iState: integer);
 // Sets the state for the outputs of a Velleman K8055(N)/VM110(N) card
 //
 //    Args:
-//        iColor (integer): the output port to be switched (0..7)
-//                          ports 0..4 are colour-coded (see const)
+//        iColor (integer): the output port to be switched (1..8)
+//                          ports 1..5 are colour-coded (see const)
 //        iState (integer): the desired state (0 = off, 1 = on)
 //
   begin
@@ -156,41 +163,41 @@ procedure pulse(iPort, iDurationOn, iDurationOff: integer);
 
 function getState(iPort: integer): integer;
   begin
-    if (iPort < 0) or (iPort > 7) then
+    if (iPort < 1) or (iPort > 8) then
 	  begin
-        writeError(ME
-                 + '.getState: port index out of bounds: '
-                 + IntToStr(iPort)
-                 + '.');
-        Result := -1;
+//          writeError(ME
+//                   + '.getState: port index out of bounds: '
+//                   + IntToStr(iPort)
+//                   + '.');
+            Result := -1;
 	  end
     else
-      Result := channelStates[iPort + 1];
+      Result := channelStates[iPort];
   end;
 
 procedure setState(iPort, iState: integer);
   begin
 //    writeDebug(ME + '.setState called.');
-    if (iPort < 0) or (iPort > 7) then
+    if (iPort < 1) or (iPort > 8) then
       begin
-        writeError(ME
-                 + '.getState: port index out of bounds: '
-                 + IntToStr(iPort)
-                 + '.');
+//        writeError(ME
+//                 + '.getState: port index out of bounds: '
+//                 + IntToStr(iPort)
+//                 + '.');
       end
     else
 	  begin
         if (iState >= 0) or (iState <= 6) then
-          channelStates[iPort + 1] := iState;
+          channelStates[iPort] := iState;
 	    Case iState Of
           0..1: Velleman(iPort, iState);
           2..6: blink(iPort, iState);
         else
-          writeError(ME
-                   + '.getState: state value out of bounds: '
-                   + IntToStr(iState)
-                   + '.');
-		end;
+//          writeError(ME
+//                   + '.getState: state value out of bounds: '
+//                   + IntToStr(iState)
+//                   + '.');
+        end;
       end;
 //    writeDebug(ME + '.setState finished.');
  end;
@@ -231,7 +238,7 @@ procedure resetController;
 //    writeDebug(ME + '.resetController called.');
     // set all outputs to "off"
     begin
-      for i := 0 to 7 do
+      for i := 1 to 8 do
         Velleman(i, 0);
 	setState(i, 0);
     end;
