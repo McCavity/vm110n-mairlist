@@ -144,6 +144,16 @@ procedure blink(iPort, iState: integer);
 //    writeDebug(ME + '.blink finished.');
 	end;
 
+procedure pulse(iPort, iDurationOn, iDurationOff: integer);
+  begin
+//    writeDebug(ME + '.blink called.');
+    Velleman(iPort, 1);
+    Sleep(iDurationOn);
+    Velleman(iPort, 0);
+    Sleep(iDurationOff);    
+//    writeDebug(ME + '.blink finished.');
+	end;
+
 function getState(iPort: integer): integer;
   begin
     if (iPort < 0) or (iPort > 7) then
@@ -204,18 +214,12 @@ procedure testController;
       begin
         for i := 1 to 8 do
           begin
-            Velleman(i, 1);
-            Sleep(1000);
-            Velleman(i, 0);
-			Sleep(200);
+	    pulse(i, 200, 50);
           end;
-        for i := 8 downto 1 do
+        for i := 6 downto 2 do
           begin
-            Velleman(i, 1);
-            Sleep(100);
-            Velleman(i, 0);
+	    pulse(i, 200, 50);
           end;
-          //Sleep(500);
       end;  
   //  writeDebug(ME + '.testController finished.');
   end;
