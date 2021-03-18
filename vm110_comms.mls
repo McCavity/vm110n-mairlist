@@ -95,38 +95,6 @@ function Abs(r: integer): integer;
     else
       Result := r;
   end;
-
-//procedure writeDebug(message: String);
-// Sends debug messages to mAirlist SystemLog
-//
-//    Args:
-//        message (string): the message
-//
-(*  var
-    messageType: TLogCategory;
-  begin
-    if DEBUG then
-      begin
-        messageType := lcDebug;
-        //Instance.GetLogger.SystemLog(messageType, message);
-        //Instance.GetLogger.SystemLog(messageType, 'foo', message);
-        //Instance.GetLogger.SystemLog('DEBUG: ' + message);
-        Instance.GetLogger.SystemLog(message);
-      end;
-  end;*)
-
-//procedure writeError(message: String);
-// Sends error messages to mAirlist SystemLog
-//
-//    Args:
-//        message (string): the message
-//
-(*  var
-    messageType: TLogCategory;
-  begin
-    messageType := lcError;
-    Instance.GetLogger.SystemLog(messageType, 'bar', message);
-  end; *)
   
 procedure Velleman(iColor, iState: integer);
 // Sets the state for the outputs of a Velleman K8055(N)/VM110(N) card
@@ -137,86 +105,63 @@ procedure Velleman(iColor, iState: integer);
 //        iState (integer): the desired state (0 = off, 1 = on)
 //
   begin
-//    writeDebug(ME + '.Velleman called.');
     if iState = 0 then
       K8055Remote(0).ClearDigitalChannel(iColor)
     else if iState = 1 then
       K8055Remote(0).SetDigitalChannel(iColor);
-//    writeDebug(ME + '.Velleman finished.');
   end;
 
 procedure blink(iPort, iState: integer);
   begin
-//    writeDebug(ME + '.blink called.');
-//    writeDebug(ME + '.blink finished.');
-	end;
+  end;
 
 procedure pulse(iPort, iDurationOn, iDurationOff: integer);
   begin
-//    writeDebug(ME + '.blink called.');
     Velleman(iPort, 1);
     Sleep(iDurationOn);
     Velleman(iPort, 0);
     Sleep(iDurationOff);    
-//    writeDebug(ME + '.blink finished.');
-	end;
+  end;
 
 function getState(iPort: integer): integer;
   begin
     if (iPort < 1) or (iPort > 8) then
-	  begin
-//          writeError(ME
-//                   + '.getState: port index out of bounds: '
-//                   + IntToStr(iPort)
-//                   + '.');
-            Result := -1;
-	  end
+      begin
+        Result := -1;
+      end
     else
       Result := channelStates[iPort];
   end;
 
 procedure setState(iPort, iState: integer);
   begin
-//    writeDebug(ME + '.setState called.');
     if (iPort < 1) or (iPort > 8) then
       begin
-//        writeError(ME
-//                 + '.getState: port index out of bounds: '
-//                 + IntToStr(iPort)
-//                 + '.');
       end
     else
-	  begin
+      begin
         if (iState >= 0) or (iState <= 6) then
           channelStates[iPort] := iState;
-	    Case iState Of
+        Case iState Of
           0..1: Velleman(iPort, iState);
           2..6: blink(iPort, iState);
         else
-//          writeError(ME
-//                   + '.getState: state value out of bounds: '
-//                   + IntToStr(iState)
-//                   + '.');
         end;
       end;
-//    writeDebug(ME + '.setState finished.');
  end;
 
 procedure initController;
   var
     i: integer;
   begin
-//    writeDebug(ME + '.initController called.');
     isOnAir      := false;
     isVoiceTrack := false;
-//    writeDebug(ME + '.initController finished.');
   end;
 
 procedure testController;
   var
     i, k: integer;
   begin
-//    writeDebug(ME + '.testController called.');
     for k := 0 to 2 do
       begin
         for i := 1 to 8 do
@@ -228,39 +173,31 @@ procedure testController;
 	    pulse(i, 200, 50);
           end;
       end;  
-  //  writeDebug(ME + '.testController finished.');
   end;
 
 procedure resetController;
   var
     i: integer;
   begin
-//    writeDebug(ME + '.resetController called.');
-    // set all outputs to "off"
     begin
       for i := 1 to 8 do
-        Velleman(i, 0);
-	setState(i, 0);
+        Velleman(i, sOFF);
+	setState(i, sOFF);
     end;
-//    writeDebug(ME + '.resetController finished.');
   end;
 
 procedure OnLoad;
   var
     i: integer;
   begin
-//    writeDebug(ME + '.OnLoad called.');
     initController; 
     testController
     resetController
-//    writeDebug(ME + '.OnLoad finished.');
   end;
 
 procedure OnUnload;
   begin
-//    writeDebug(ME + '.OnUnload called.'); 
     resetController;
-//    writeDebug(ME + '.OnUnload finished.');
   end;
 
 procedure OnOnAir;
@@ -280,30 +217,17 @@ procedure OnOffAir;
 procedure OnPlayerEOFWarning(PlaylistIndex: integer;
                              PlayerIndex: integer);
 begin
-//    writeDebug(ME
-//             + '.OnPlayerEOFWarning called. PlaylistIndex: '
-//             + IntToStr(PlaylistIndex)
-//             + ', PlayerIndex: '
-//             + IntToStr(PlayerIndex));    
-    // set "onAir" to slow blinking
-//    writeDebug(ME + '.OnPlayerEOFWarning finished.');
+  // set "onAir" to slow blinking
   end;
 
 // Called when RuntimeData (global variables shared among scripts) change.
 // Set data with SetRuntimData(key, value);
 procedure OnRuntimeDataChange(Key, Value: string);
   begin
-//    writeDebug(ME
-//             + '.OnRuntimeDataChange called. Key: '
-//             + Key 
-//             + ', Value: '
-//             + Value);
-//    writeDebug(ME + '.OnRuntimeDataChange finished.');
   end;
 
 // Main()
 begin
-//  writeDebug(ME + '.Main() called.');
   initController;
   if DEBUG then
     begin
@@ -313,5 +237,4 @@ begin
     begin
       resetController;
     end;
-//  writeDebug(ME + '.Main() finished.');
 end.
